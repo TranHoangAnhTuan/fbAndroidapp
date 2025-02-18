@@ -1,9 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:fb_scrape/sign_in/components/custom_text_field.dart';
 import 'package:fb_scrape/sign_in/components/social_sign_in_button.dart';
+import 'package:fb_scrape/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  Future<User?> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return null;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = 
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      return userCredential.user;
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,17 +84,22 @@ class SignInScreen extends StatelessWidget {
                     color: Color(0xFFF5F3F3),
                     borderRadius: BorderRadius.circular(60),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'ex:john.smith@gmai.com',
-                      style: TextStyle(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'ex:john.smith@gmail.com',
+                      hintStyle: TextStyle(
                         color: Color(0xFFCAC2C2),
                         fontSize: 15,
                         fontFamily: 'Inter',
                       ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20),
                     ),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontFamily: 'Inter',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
                   ),
                 ),
                 SizedBox(height: 5),
@@ -91,17 +124,24 @@ class SignInScreen extends StatelessWidget {
                     color: Color(0xFFF5F3F3),
                     borderRadius: BorderRadius.circular(60),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '************',
-                      style: TextStyle(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: '••••••••',
+                      hintStyle: TextStyle(
                         color: Color(0xFFCAC2C2),
                         fontSize: 15,
                         fontFamily: 'Inter',
                       ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20),
                     ),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontFamily: 'Inter',
+                    ),
+                    obscureText: true, // This hides the password text
+                    enableSuggestions: false,
+                    autocorrect: false,
                   ),
                 ),
                 SizedBox(height: 30),
@@ -141,8 +181,71 @@ class SignInScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 34),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center, // Changed to center
-                  
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        User? user = await _signInWithGoogle();
+                        if (user != null && context.mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const MainScreen()),
+                          );
+                        }
+                      },
+                      child: Container(
+                        width: 86,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF4F4F4),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/icons/XMLID_28_.png',
+                            width: 24,
+                            height: 24,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Container(
+                      width: 86,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF4F4F4),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/icons/primary.png'
+                         ,
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Container(
+                      width: 86,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF4F4F4),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                           'assets/icons/instagram 1.png',
+                          width: 24,
+                          height: 24,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 37),
                 Center(
@@ -162,7 +265,7 @@ class SignInScreen extends StatelessWidget {
                       Text(
                         'sign up',
                         style: TextStyle(
-                          color: Color(0xFF000100),
+                          color: Color(0xFF46BE5C),
                           fontSize: 15,
                           fontWeight: FontWeight.w300,
                           fontFamily: 'Inter',
