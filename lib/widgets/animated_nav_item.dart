@@ -31,7 +31,7 @@ class _AnimatedNavItemState extends State<AnimatedNavItem> with SingleTickerProv
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500), // Increased duration for smoother animation
+      duration: const Duration(milliseconds: 600), // Increased duration for smoother animation
       vsync: this,
     );
 
@@ -121,7 +121,7 @@ class _AnimatedNavItemState extends State<AnimatedNavItem> with SingleTickerProv
                         child: Text(
                           widget.label,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: Color(0xFF030D45),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
