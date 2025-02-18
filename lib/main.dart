@@ -122,10 +122,10 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: _pages[_selectedIndex], // Display selected page
       bottomNavigationBar: Container(
-        height: 80,
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        height: 70,
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color.fromARGB(255, 209, 209, 209),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(

@@ -25,27 +25,32 @@ class _AnimatedNavItemState extends State<AnimatedNavItem> with SingleTickerProv
   late Animation<double> _widthAnimation;
   late Animation<double> _iconSlideAnimation;
   late Animation<double> _textSlideAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 500), // Increased duration for smoother animation
       vsync: this,
     );
 
-    // Modified width animation to expand from center
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
+      ),
+    );
+
     _widthAnimation = Tween<double>(begin: 40, end: 120).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    // Adjusted icon slide animation
     _iconSlideAnimation = Tween<double>(begin: 0, end: -30).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
 
-    // Adjusted text slide animation
-    _textSlideAnimation = Tween<double>(begin: 0, end: 30).animate(
+    _textSlideAnimation = Tween<double>(begin: 0, end: 20).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -79,37 +84,40 @@ class _AnimatedNavItemState extends State<AnimatedNavItem> with SingleTickerProv
               width: 40,
               height: 40,
               alignment: Alignment.center,
-              child: Image.asset(
-                widget.isSelected ? widget.activeIcon : widget.icon,
-                width: 24,
-                height: 24,
+              child: FadeTransition(
+                opacity: ReverseAnimation(_fadeAnimation), // Fade in when deselected
+                child: Image.asset(
+                  widget.icon,
+                  width: 24,
+                  height: 24,
+                ),
               ),
             ),
             // Animated container that expands from center
             if (widget.isSelected)
-              Container(
-                width: _widthAnimation.value,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF46BE5C),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    Transform.translate(
-                      offset: Offset(_iconSlideAnimation.value, 0),
-                      child: Image.asset(
-                        widget.activeIcon,
-                        width: 24,
-                        height: 24,
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: Container(
+                  width: _widthAnimation.value,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF46BE5C),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      Transform.translate(
+                        offset: Offset(_iconSlideAnimation.value, 0),
+                        child: Image.asset(
+                          widget.activeIcon,
+                          width: 24,
+                          height: 24,
+                        ),
                       ),
-                    ),
-                    Transform.translate(
-                      offset: Offset(_textSlideAnimation.value, 0),
-                      child: FadeTransition(
-                        opacity: _controller,
+                      Transform.translate(
+                        offset: Offset(_textSlideAnimation.value, 0),
                         child: Text(
                           widget.label,
                           style: const TextStyle(
@@ -120,8 +128,8 @@ class _AnimatedNavItemState extends State<AnimatedNavItem> with SingleTickerProv
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             Positioned.fill(
